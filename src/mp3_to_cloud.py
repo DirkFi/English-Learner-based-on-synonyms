@@ -17,8 +17,7 @@ if __name__ == '__main__':
     # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
     # or run on CPU with INT8
     # model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    print(1)
-    segments, info = model.transcribe("C:\\Users\\Dirk\\Desktop\\tttt.mp3", beam_size=5)
+    segments, info = model.transcribe("../MP3/short_test.mp3", beam_size=5)
     res_str = ""
     print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
     for segment in segments:
@@ -38,4 +37,13 @@ if __name__ == '__main__':
 
     # word frequency
     freq = Counter(res_str.split()).most_common()
+    freq = dict(freq)
+    # data cleaning
+    preposition_set = set(['with', 'at', 'by', 'to', 'in', 'for', 'from', 'of', 'on'])
+    delete_key = []
+    for freq_key in freq:
+        if freq_key in preposition_set:
+            delete_key.append(freq_key)
+    for tmp_key in delete_key:
+        freq.pop(tmp_key)
     print(freq)
