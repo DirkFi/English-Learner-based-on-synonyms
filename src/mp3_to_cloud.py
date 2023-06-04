@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
 
-
-if __name__ == '__main__':
+def generate_response(file_name: str):
     from faster_whisper import WhisperModel
     import openai
     model_size = "large-v2"
@@ -22,7 +21,7 @@ if __name__ == '__main__':
     # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
     # or run on CPU with INT8
     # model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    segments, info = model.transcribe("../MP3/short_test.mp3", beam_size=5)
+    segments, info = model.transcribe(file_name, beam_size=5)
     res_str = ""
     print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
     for segment in segments:
@@ -64,7 +63,8 @@ if __name__ == '__main__':
             if word in sentence:
                 word2sentence_dict[word].append(sentence)
     # print(word2sentence_dict)
-
+    # TODO: filter those words in the same sentences especially when the word is not noun or adj or verb
+    responses = defaultdict(list)
     for word in word2sentence_dict:
         # print("word {} used in this sentence {}\n".format(word, word2sentence_dict[word]))
         prompt = "I'm using {} a lot in my speaking. How can you help me polish the use\
@@ -80,5 +80,8 @@ if __name__ == '__main__':
             temperature=0.5,
         )
 
-        response = completion.choices[0].text
-        print(response)
+        responses[word].append(completion.choices[0].text)
+    return responses
+
+if __name__ == '__main__':
+    print(generate_response("../MP3/short_test.mp3"))
