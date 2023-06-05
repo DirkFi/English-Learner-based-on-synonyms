@@ -46,9 +46,9 @@ def plotting_demo():
     st.write(
         """
         This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!
-"""
+        Streamlit. We're generating a bunch of random numbers in a loop for around
+        5 seconds. Enjoy!
+        """
     )
 
     progress_bar = st.sidebar.progress(0)
@@ -87,28 +87,19 @@ def from_file():
     filenames = os.listdir(folder_path)
     audio_file = col2.selectbox("**Select a file**", filenames)
     audio_path = os.path.join(folder_path, audio_file)
+    gpt_key = col3.text_input("**Your GPT API KEY here**👇" , "")
 
-    gpt_key = col3.text_input("**Your GPT API here**👇" , "")
     if st.session_state['btn_clicked'] or clicked:
-        print(111111)
         if not (audio_path and folder_path):
             st.warning('you should fill both `audio_link` and `folder_path`', icon="⚠️")
         elif not is_audio_file(audio_path):
             st.warning('you should choose the correct **audio** file', icon="⚠️")
+        else: # begin the generation process
+            with st.spinner('Wait for it...'):
+                responses = generate_response(audio_path)
+            for word in responses:
+                st.text_area("Word {}: {}".format(word, responses[word]))
 
-        responses = generate_response(audio_path)
-        print(audio_path)
-        for word in responses:
-            st.text_area("Word {}: {}".format(word, responses[word]))
-    # txt = st.text_area('Text to analyze', '''
-    # It was the best of times, it was the worst of times, it was
-    # the age of wisdom, it was the age of foolishness, it was
-    # the epoch of belief, it was the epoch of incredulity, it
-    # was the season of Light, it was the season of Darkness, it
-    # was the spring of hope, it was the winter of despair, (...)
-    # ''')
-
-    #st.write('Sentiment:', run_sentiment_analysis(txt))
 
 page_names_to_funcs = {
     "—": intro,
