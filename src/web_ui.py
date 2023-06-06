@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 from mp3_to_cloud import generate_response
+from PIL import Image
 
 def is_audio_file(filepath):
     audio_extensions = ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac']
@@ -80,14 +81,18 @@ def from_file():
         # change state value
         st.session_state['btn_clicked'] = True
 
-    col1, col2, col3 = st.columns([3, 3, 3])
+    col1, col2, col3 = st.columns([3, 3, 6])
     with col1:
-        folder_path = st.text_input("**Place path to saved folder here**👇" , ".")
+        folder_path = st.text_input("**Folder path**👇" , ".")
         clicked = st.button(label="Generate", key=0, on_click=callback)
     filenames = os.listdir(folder_path)
     audio_file = col2.selectbox("**Select a file**", filenames)
     audio_path = os.path.join(folder_path, audio_file)
     gpt_key = col3.text_input("**Your GPT API KEY here**👇" , "")
+
+    # show wordcloud
+    image = Image.open('wordcloud.png')
+    st.image(image, caption='Your generated wordcloud', width=450)
 
     if st.session_state['btn_clicked'] or clicked:
         if not (audio_path and folder_path):
@@ -96,9 +101,12 @@ def from_file():
             st.warning('you should choose the correct **audio** file', icon="⚠️")
         else: # begin the generation process
             with st.spinner('Wait for it...'):
-                responses = generate_response(audio_path)
+                responses = generate_response(audio_path, gpt_key)
             for word in responses:
-                st.text_area("Word {}: {}".format(word, responses[word]))
+                output_string = "You can improve **Word {}** like this: ".format(word)
+                for response in responses[word]:
+                    output_string += response
+                st.markdown(output_string)
 
 
 page_names_to_funcs = {

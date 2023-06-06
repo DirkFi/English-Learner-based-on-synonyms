@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
 
-def generate_response(file_name: str):
+def generate_response(file_name: str, api_key: str):
     from faster_whisper import WhisperModel
     import openai
     model_size = "large-v2"
     # Set up the OpenAI API client
-    openai.api_key = "YOUR_API_KEY"
+    openai.api_key = api_key
     # Set up the model and prompt
     model_engine = "text-davinci-003"
     
