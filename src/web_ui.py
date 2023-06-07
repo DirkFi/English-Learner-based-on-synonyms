@@ -1,7 +1,8 @@
 import streamlit as st
 import os
-from mp3_to_cloud import generate_response
+from mp3_to_cloud import generate_response, generate_dict
 from PIL import Image
+import pandas as pd
 
 def is_audio_file(filepath):
     audio_extensions = ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac']
@@ -74,6 +75,8 @@ def plotting_demo():
 
 def from_file():
     import streamlit as st
+    import spacy
+    sp = spacy.load('en_core_web_sm')
     if 'btn_clicked' not in st.session_state:
         st.session_state['btn_clicked'] = False
 
@@ -90,9 +93,6 @@ def from_file():
     audio_path = os.path.join(folder_path, audio_file)
     gpt_key = col3.text_input("**Your GPT API KEY here**👇" , "")
 
-    # show wordcloud
-    image = Image.open('wordcloud.png')
-    st.image(image, caption='Your generated wordcloud', width=450)
 
     if st.session_state['btn_clicked'] or clicked:
         if not (audio_path and folder_path):
@@ -101,7 +101,19 @@ def from_file():
             st.warning('you should choose the correct **audio** file', icon="⚠️")
         else: # begin the generation process
             with st.spinner('Wait for it...'):
-                responses = generate_response(audio_path, gpt_key)
+                freq, word2sentence_dict = generate_dict(audio_path)
+                df = pd.DataFrame(
+                    [
+                        {"word": w, "parts of speech": sp(u"w")[0].pos_, "frequency": freq[w]} for w in freq
+                    ]
+                )
+                print("Congrats! Dict generation is done!")
+                # show dataframe
+                st.dataframe(df, use_container_width=True)
+                # show wordcloud
+                image = Image.open('wordcloud.png')
+                st.image(image, caption='Your generated wordcloud', width=450)
+                responses = generate_response(gpt_key, word2sentence_dict)
             for word in responses:
                 output_string = "You can improve **Word {}** like this: ".format(word)
                 for response in responses[word]:

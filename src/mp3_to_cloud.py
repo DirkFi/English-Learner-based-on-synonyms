@@ -5,14 +5,10 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
 
-def generate_response(file_name: str, api_key: str):
+def generate_dict(file_name: str):
     from faster_whisper import WhisperModel
-    import openai
     model_size = "large-v2"
-    # Set up the OpenAI API client
-    openai.api_key = api_key
-    # Set up the model and prompt
-    model_engine = "text-davinci-003"
+
     
     # Run on GPU with FP16
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
@@ -64,12 +60,21 @@ def generate_response(file_name: str, api_key: str):
                 word2sentence_dict[word].append(sentence)
     # print(word2sentence_dict)
     # TODO: filter those words in the same sentences especially when the word is not noun or adj or verb
+    return freq, word2sentence_dict
+
+
+def generate_response( api_key: str, word2sen_dict):
+    import openai
+    # Set up the OpenAI API client
+    openai.api_key = api_key
+    # Set up the model and prompt
+    model_engine = "text-davinci-003"
     responses = defaultdict(list)
-    for word in word2sentence_dict:
+    for word in word2sen_dict:
         # print("word {} used in this sentence {}\n".format(word, word2sentence_dict[word]))
         prompt = "I'm using {} a lot in my speaking. How can you help me polish the use\
             of word {} to improve my English skill with the word {}. \
-            Sentences are {}".format(word, word, word, word2sentence_dict[word])
+            Sentences are {}".format(word, word, word, word2sen_dict[word])
         # Generate a response
         completion = openai.Completion.create(
             engine=model_engine,
