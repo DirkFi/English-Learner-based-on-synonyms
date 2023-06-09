@@ -102,17 +102,23 @@ def from_file():
         else: # begin the generation process
             with st.spinner('Wait for it...'):
                 freq, word2sentence_dict = generate_dict(audio_path)
-                df = pd.DataFrame(
-                    [
-                        {"word": w, "parts of speech": sp(u"w")[0].pos_, "frequency": freq[w]} for w in freq
-                    ]
-                )
+                data = []
+                for w in freq:
+                    sentens = word2sentence_dict[w][0].strip().split(" ")
+                    data.append([w, sp(word2sentence_dict[w][0])[sentens.index(w)].pos_, freq[w]])
+                df = pd.DataFrame(data, columns=["word", "parts of speech", "frequency"])
+                #df = pd.DataFrame(
+                #    [
+                #        {"word": w, "parts of speech": sp(word2sentence_dict[w][0])[word2sentence_dict[w][0].split(" ").index(w)].pos_, "frequency": freq[w]} for w in freq
+                #    ]
+                #)
                 print("Congrats! Dict generation is done!")
                 # show dataframe
                 st.dataframe(df, use_container_width=True)
                 # show wordcloud
                 image = Image.open('wordcloud.png')
                 st.image(image, caption='Your generated wordcloud', width=450)
+
                 responses = generate_response(gpt_key, word2sentence_dict)
             for word in responses:
                 output_string = "You can improve **Word {}** like this: ".format(word)
