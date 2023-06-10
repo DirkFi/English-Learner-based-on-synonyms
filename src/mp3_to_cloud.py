@@ -4,6 +4,7 @@ from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
+import re
 
 def generate_dict(file_name: str):
     from faster_whisper import WhisperModel
@@ -34,6 +35,9 @@ def generate_dict(file_name: str):
     plt.tight_layout(pad=0)
     plt.savefig("wordcloud.png")
 
+    # save list first so that it contains punctuation still
+    res_str_list = res_str.split(".")
+    res_str = re.sub(r'[^\w\s]','',res_str)
     # count word frequency
     freq = Counter(res_str.split()).most_common()
     freq = dict(freq)
@@ -53,13 +57,16 @@ def generate_dict(file_name: str):
     # find top 10 words in their original sentence
     word2sentence_dict = defaultdict(list)
     freq = dict(sorted(freq.items(), key = lambda x: x[1], reverse = True)[:10])
-    res_str_list = res_str.split(".")
+    
     for sentence in res_str_list:
         for word in freq:
             if word in sentence:
                 word2sentence_dict[word].append(sentence)
     # print(word2sentence_dict)
+
     # TODO: filter those words in the same sentences especially when the word is not noun or adj or verb
+
+    
     return freq, word2sentence_dict
 
 

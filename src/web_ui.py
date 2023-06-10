@@ -3,6 +3,7 @@ import os
 from mp3_to_cloud import generate_response, generate_dict
 from PIL import Image
 import pandas as pd
+import string
 
 def is_audio_file(filepath):
     audio_extensions = ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac']
@@ -86,13 +87,13 @@ def from_file():
 
     col1, col2, col3 = st.columns([3, 3, 6])
     with col1:
-        folder_path = st.text_input("**Folder path**👇" , ".")
+        folder_path = st.text_input("**Folder path**👇" , "../MP3")
         clicked = st.button(label="Generate", key=0, on_click=callback)
     filenames = os.listdir(folder_path)
     audio_file = col2.selectbox("**Select a file**", filenames)
     audio_path = os.path.join(folder_path, audio_file)
     gpt_key = col3.text_input("**Your GPT API KEY here**👇" , "")
-
+    puctuation_str = string.punctuation
 
     if st.session_state['btn_clicked'] or clicked:
         if not (audio_path and folder_path):
@@ -104,8 +105,12 @@ def from_file():
                 freq, word2sentence_dict = generate_dict(audio_path)
                 data = []
                 for w in freq:
-                    sentens = word2sentence_dict[w][0].strip().split(" ")
-                    data.append([w, sp(word2sentence_dict[w][0])[sentens.index(w)].pos_, freq[w]])
+                    sentens = word2sentence_dict[w][0].strip()
+                    # remove all puctuations in the string
+                    for i in puctuation_str:
+                        sentens = sentens.replace(i, "")
+                    sentens_list = sentens.split(" ")
+                    data.append([w, sp(sentens)[sentens_list.index(w)].pos_, freq[w]])
                 df = pd.DataFrame(data, columns=["word", "parts of speech", "frequency"])
                 #df = pd.DataFrame(
                 #    [
