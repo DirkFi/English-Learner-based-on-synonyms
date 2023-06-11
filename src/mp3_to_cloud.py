@@ -10,7 +10,6 @@ def generate_dict(file_name: str):
     from faster_whisper import WhisperModel
     model_size = "large-v2"
 
-    
     # Run on GPU with FP16
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
     stopwords = set(STOPWORDS)
@@ -80,8 +79,8 @@ def generate_response( api_key: str, word2sen_dict):
     for word in word2sen_dict:
         # print("word {} used in this sentence {}\n".format(word, word2sentence_dict[word]))
         prompt = "I'm using {} a lot in my speaking. How can you help me polish the use\
-            of word {} to improve my English skill with the word {}. \
-            Sentences are {}".format(word, word, word, word2sen_dict[word])
+            of word {} to improve my English skill. \
+            My sentences are {}".format(word, word, word2sen_dict[word])
         # Generate a response
         completion = openai.Completion.create(
             engine=model_engine,
@@ -94,6 +93,7 @@ def generate_response( api_key: str, word2sen_dict):
 
         responses[word].append(completion.choices[0].text)
     return responses
+
 
 if __name__ == '__main__':
     print(generate_response("../MP3/short_test.mp3"))

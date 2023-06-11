@@ -118,24 +118,33 @@ def from_file():
                 #    ]
                 #)
                 print("Congrats! Dict generation is done!")
-                # show dataframe
-                st.dataframe(df, use_container_width=True)
+                tab1, tab2, tab3 = st.tabs(["Improvements", "WordCloud", "Table"])
                 # show wordcloud
-                image = Image.open('wordcloud.png')
-                st.image(image, caption='Your generated wordcloud', width=450)
+                with tab2:
+                    st.header("Wordcloud Figure")
+                    image = Image.open('wordcloud.png')
+                    st.image(image, caption='Your generated wordcloud', width=450)
+                # show dataframe
+                with tab3:
+                    st.header("Top-10 Words Frequency Table")
+                    st.dataframe(df, use_container_width=True)
+
 
                 responses = generate_response(gpt_key, word2sentence_dict)
-            for word in responses:
-                output_string = "You can improve **Word {}** like this: ".format(word)
-                for response in responses[word]:
-                    output_string += response
-                st.markdown(output_string)
 
+                for word in responses:
+                    output_string = "##### You can improve the **Word {}** like this: ".format(word)
+                    for response in responses[word]:
+                        output_string += response
+                    with tab1:
+                        st.markdown(output_string)
+
+    # st.button("Re-run")
 
 page_names_to_funcs = {
     "—": intro,
     "Plotting Demo": plotting_demo,
-    "sss": from_file
+    "Improve YOUR English": from_file
 }
 
 demo_name = st.sidebar.selectbox("Choose your function", page_names_to_funcs.keys())
