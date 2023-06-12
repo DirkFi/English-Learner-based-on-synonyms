@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
 import re
+import warnings
 
 def generate_dict(file_name: str):
     from faster_whisper import WhisperModel
@@ -23,6 +24,12 @@ def generate_dict(file_name: str):
     for segment in segments:
         res_str += segment.text
         # print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
+    if not res_str:
+        # adding a single entry into warnings filter
+        warnings.simplefilter('error', UserWarning)
+        # displaying the warning
+        warnings.warn('Check your input please, it may not include any relevant words.')
+    print("null res_str looks like {}".format(res_str))
     wordcloud = WordCloud(width=800, height=800,
                           background_color='white',
                           stopwords=stopwords,
@@ -51,7 +58,6 @@ def generate_dict(file_name: str):
             delete_key.append(freq_key)
     for tmp_key in delete_key:
         freq.pop(tmp_key)
-    print(freq)
 
     # find top 10 words in their original sentence
     word2sentence_dict = defaultdict(list)
@@ -61,7 +67,7 @@ def generate_dict(file_name: str):
         for word in freq:
             if word in sentence:
                 word2sentence_dict[word].append(sentence)
-    # print(word2sentence_dict)
+    # print("word to sentence is ", word2sentence_dict)
 
     # TODO: filter those words in the same sentences especially when the word is not noun or adj or verb
 
