@@ -15,66 +15,34 @@ def is_audio_file(filepath):
 def intro():
     import streamlit as st
 
-    st.write("# Welcome to Streamlit! 👋")
+    st.write("# Welcome to LearnEnglish! 😡 ")
     st.sidebar.success("Select a func above.")
 
     st.markdown(
         """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
+        English Learner based on synonyms is an open-source program built on Python 
+        framework Streamlit. The program also takes advantage of the ChatGPT 
+        api to absorb the content.
 
-        **👈 Select a demo from the dropdown on the left** to see some examples
-        of what Streamlit can do!
+        **👈 Select a function from the dropdown on the left** to see what you can 
+        do and learn through our program!
 
-        ### Want to learn more?
+        ### Upload a file to learn
 
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
+        - Fill in the corret file path of your audio file
+        - Fill in your ChatGPT api key ([how to find your 
+        api key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key))
+        - Hit Generate Button and Wait
 
-        ### See more complex demos
+        ### Speak on your microphone
 
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
+        - Hit Record Button to record your own voice
+        - Hit it again to stop and save. *The audio file will automatically 
+        be saved in the same folder in your code path.*
+        - Fill in your ChatGPT api key
+        - Hit Generate Button and Wait for the results
     """
     )
-
-
-def plotting_demo():
-    import streamlit as st
-    import time
-    import numpy as np
-
-    st.markdown(f'# {list(page_names_to_funcs.keys())[1]}')
-    st.write(
-        """
-        This demo illustrates a combination of plotting and animation with
-        Streamlit. We're generating a bunch of random numbers in a loop for around
-        5 seconds. Enjoy!
-        """
-    )
-
-    progress_bar = st.sidebar.progress(0)
-    status_text = st.sidebar.empty()
-    last_rows = np.random.randn(1, 1)
-    chart = st.line_chart(last_rows)
-
-    for i in range(1, 101):
-        new_rows = last_rows[-1, :] + np.random.randn(5, 1).cumsum(axis=0)
-        status_text.text("%i%% Complete" % i)
-        chart.add_rows(new_rows)
-        progress_bar.progress(i)
-        last_rows = new_rows
-        time.sleep(0.05)
-
-    progress_bar.empty()
-
-    # Streamlit widgets automatically run the script from top to bottom. Since
-    # this button is not connected to any other logic, it just causes a plain
-    # rerun.
-    st.button("Re-run")
 
 def from_file():
 
@@ -206,9 +174,8 @@ def audio_input():
                 st.markdown(output_string)
 
 page_names_to_funcs = {
-    "—": intro,
-    "Plotting Demo": plotting_demo,
-    "Upload file to improve your English": from_file, 
+    "MainPage": intro,
+    "Upload a file to improve your English": from_file, 
     "Speak to YOUR Mic": audio_input
 }
 

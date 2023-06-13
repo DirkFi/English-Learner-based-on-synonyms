@@ -1,0 +1,5 @@
+faster-whisper
+wordcloud
+openai
+streamlit
+streamlit-audiorecorder
