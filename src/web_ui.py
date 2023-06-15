@@ -12,9 +12,8 @@ def is_audio_file(filepath):
     extension = filepath.rsplit('.', 1)[-1].lower()
     return extension in audio_extensions
 
-def intro():
-    import streamlit as st
 
+def intro():
     st.write("# Welcome to LearnEnglish! 😡 ")
     st.sidebar.success("Select a func above.")
 
@@ -45,7 +44,6 @@ def intro():
     )
 
 def from_file():
-
     sp = spacy.load('en_core_web_sm')
     if 'btn_clicked' not in st.session_state:
         st.session_state['btn_clicked'] = False
@@ -82,12 +80,8 @@ def from_file():
                     sentens_list = sentens.split(" ")
                     data.append([w, sp(sentens)[sentens_list.index(w)].pos_, freq[w]])
                 df = pd.DataFrame(data, columns=["word", "parts of speech", "frequency"])
-                #df = pd.DataFrame(
-                #    [
-                #        {"word": w, "parts of speech": sp(word2sentence_dict[w][0])[word2sentence_dict[w][0].split(" ").index(w)].pos_, "frequency": freq[w]} for w in freq
-                #    ]
-                #)
                 print("Congrats! Dict generation is done!")
+
                 tab1, tab2, tab3 = st.tabs(["Improvements", "WordCloud", "Table"])
                 # show wordcloud
                 with tab2:
@@ -99,11 +93,11 @@ def from_file():
                     st.header("Top-10 Words Frequency Table")
                     st.dataframe(df, use_container_width=True)
 
-
                 responses = generate_response(gpt_key, word2sentence_dict)
 
                 for word in responses:
-                    output_string = "##### You can improve the **Word {}** like this: ".format(word)
+                    output_string = "##### You can improve the **Word {}** like this: "\
+                    .format(word)
                     for response in responses[word]:
                         output_string += response
                     with tab1:
@@ -149,11 +143,7 @@ def audio_input():
                 sentens_list = sentens.split(" ")
                 data.append([w, sp(sentens)[sentens_list.index(w)].pos_, freq[w]])
             df = pd.DataFrame(data, columns=["word", "parts of speech", "frequency"])
-            #df = pd.DataFrame(
-            #    [
-            #        {"word": w, "parts of speech": sp(word2sentence_dict[w][0])[word2sentence_dict[w][0].split(" ").index(w)].pos_, "frequency": freq[w]} for w in freq
-            #    ]
-            #)
+
             print("Congrats! Dict generation is done!")
             # tab1, tab2, tab3 = st.tabs(["Improvements", "WordCloud", "Table"])
             # show wordcloud
@@ -164,11 +154,11 @@ def audio_input():
             with st.expander("See Frequency Table"):
                 st.dataframe(df, use_container_width=True)
 
-
             responses = generate_response(gpt_key, word2sentence_dict)
 
             for word in responses:
-                output_string = "##### You can improve the **Word {}** like this: ".format(word)
+                output_string = "##### You can improve the **Word {}** like this: "\
+                .format(word)
                 for response in responses[word]:
                     output_string += response
                 st.markdown(output_string)

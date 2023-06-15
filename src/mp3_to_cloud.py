@@ -11,11 +11,11 @@ def generate_dict(file_name: str):
     from faster_whisper import WhisperModel
     model_size = "large-v2"
 
-    # Run on GPU with FP16
+    # Run on CPU with INT8
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
     stopwords = set(STOPWORDS)
-    # or run on GPU with INT8
-    # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
+    # or run on GPU with FP16
+    # model = WhisperModel(model_size, device="cuda", compute_type="float16")
     # or run on CPU with INT8
     # model = WhisperModel(model_size, device="cpu", compute_type="int8")
     segments, info = model.transcribe(file_name, beam_size=5)
@@ -23,13 +23,12 @@ def generate_dict(file_name: str):
     print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
     for segment in segments:
         res_str += segment.text
-        # print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
+
     if not res_str:
         # adding a single entry into warnings filter
         warnings.simplefilter('error', UserWarning)
         # displaying the warning
         warnings.warn('Check your input please, it may not include any relevant words.')
-    print("null res_str looks like {}".format(res_str))
     wordcloud = WordCloud(width=800, height=800,
                           background_color='white',
                           stopwords=stopwords,
@@ -50,11 +49,13 @@ def generate_dict(file_name: str):
 
     # data cleaning
     preposition_set = set(['with', 'at', 'by', 'to', 'in', 'for', 'from', 'of', 'on'])
-    prons_set = set(['me', 'my', "I", 'he', 'his', 'him', 'she', 'her', 'they', 'them', 'their', 'its', 'you', 'your'])
+    prons_set = set(['me', 'my', "I", 'he', 'his', 'him', 'she', 'her', 'they', 'them', 
+                     'their', 'its', 'you', 'your'])
     article_set = set(['a', 'an', 'the', 'this'])
     delete_key = []
     for freq_key in freq:
-        if freq_key in preposition_set or freq_key in prons_set or freq_key in article_set:
+        if freq_key in preposition_set or freq_key in prons_set or \
+        freq_key in article_set:
             delete_key.append(freq_key)
     for tmp_key in delete_key:
         freq.pop(tmp_key)
@@ -67,23 +68,23 @@ def generate_dict(file_name: str):
         for word in freq:
             if word in sentence:
                 word2sentence_dict[word].append(sentence)
-    # print("word to sentence is ", word2sentence_dict)
 
-    # TODO: filter those words in the same sentences especially when the word is not noun or adj or verb
+    # TODO: filter those words in the same sentences especially when the word 
+    # is not noun or adj or verb
 
     
     return freq, word2sentence_dict
 
 
-def generate_response( api_key: str, word2sen_dict):
+def generate_response(api_key: str, word2sen_dict):
     import openai
     # Set up the OpenAI API client
     openai.api_key = api_key
     # Set up the model and prompt
     model_engine = "text-davinci-003"
     responses = defaultdict(list)
+
     for word in word2sen_dict:
-        # print("word {} used in this sentence {}\n".format(word, word2sentence_dict[word]))
         prompt = "I'm using {} a lot in my speaking. How can you help me polish the use\
             of word {} to improve my English skill. \
             My sentences are {}".format(word, word, word2sen_dict[word])
@@ -102,4 +103,5 @@ def generate_response( api_key: str, word2sen_dict):
 
 
 if __name__ == '__main__':
-    print(generate_response("../MP3/short_test.mp3"))
+    frq, w2s_dict = generate_dict("../MP3/short_test.mp3")
+    print(generate_response("key", w2s_dict))
