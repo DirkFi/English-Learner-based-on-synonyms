@@ -14,7 +14,7 @@ def is_audio_file(filepath):
 
 
 def intro():
-    st.write("# Welcome to LearnEnglish! 😡 ")
+    st.write("# Welcome to LearnEnglish! 😉")
     st.sidebar.success("Select a func above.")
 
     st.markdown(
@@ -42,6 +42,7 @@ def intro():
         - Hit Generate Button and Wait for the results
     """
     )
+
 
 def from_file():
     sp = spacy.load('en_core_web_sm')
@@ -71,7 +72,6 @@ def from_file():
             with st.spinner('Wait for it...'):
                 freq, word2sentence_dict = generate_dict(audio_path)
                 data = []
-                # not for w in freq
                 for w in word2sentence_dict:
                     sentens = word2sentence_dict[w][0].strip()
                     # remove all puctuations in the string
@@ -97,13 +97,12 @@ def from_file():
 
                 for word in responses:
                     output_string = "##### You can improve the **Word {}** like this: "\
-                    .format(word)
+                                                                    .format(word)
                     for response in responses[word]:
                         output_string += response
                     with tab1:
                         st.markdown(output_string)
 
-    # st.button("Re-run")
 
 def audio_input():
     st.title("Audio Recorder")

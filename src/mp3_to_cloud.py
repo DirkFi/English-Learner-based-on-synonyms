@@ -18,14 +18,16 @@ def generate_dict(file_name: str):
     # model = WhisperModel(model_size, device="cuda", compute_type="float16")
     # or run on CPU with INT8
     # model = WhisperModel(model_size, device="cpu", compute_type="int8")
+
     segments, info = model.transcribe(file_name, beam_size=5)
     res_str = ""
-    print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
+    print("Detected language '%s' with probability %f" % (info.language,
+                                                        info.language_probability))
     for segment in segments:
         res_str += segment.text
 
     if not res_str:
-        # adding a single entry into warnings filter
+        # add a single entry into warnings filter
         warnings.simplefilter('error', UserWarning)
         # displaying the warning
         warnings.warn('Check your input please, it may not include any relevant words.')
@@ -50,12 +52,14 @@ def generate_dict(file_name: str):
     # data cleaning
     preposition_set = set(['with', 'at', 'by', 'to', 'in', 'for', 'from', 'of', 'on'])
     prons_set = set(['me', 'my', "I", 'he', 'his', 'him', 'she', 'her', 'they', 'them', 
-                     'their', 'its', 'you', 'your'])
-    article_set = set(['a', 'an', 'the', 'this'])
+                     'their', 'its', 'you', 'your', 'our', 'us'])
+    article_set = set(['a', 'an', 'the', 'this', 'that'])
+    easyWord_set = set(['hi', 'hello', 'ok', 'is', 'are', 'was', 'were', 'been', 
+                        'being'])
     delete_key = []
     for freq_key in freq:
         if freq_key in preposition_set or freq_key in prons_set or \
-        freq_key in article_set:
+        freq_key in article_set or freq_key in easyWord_set:
             delete_key.append(freq_key)
     for tmp_key in delete_key:
         freq.pop(tmp_key)
@@ -68,10 +72,6 @@ def generate_dict(file_name: str):
         for word in freq:
             if word in sentence:
                 word2sentence_dict[word].append(sentence)
-
-    # TODO: filter those words in the same sentences especially when the word 
-    # is not noun or adj or verb
-
     
     return freq, word2sentence_dict
 
