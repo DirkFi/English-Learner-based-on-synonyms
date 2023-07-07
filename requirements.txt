@@ -3,3 +3,4 @@ wordcloud
 openai
 streamlit
 streamlit-audiorecorder
+spacy
